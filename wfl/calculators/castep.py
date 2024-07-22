@@ -88,7 +88,9 @@ class Castep(WFLFileIOCalculator, ASE_Castep):
 
         # from WFLFileIOCalculator
         self.setup_rundir()
-        print("directory", self.directory)
+        for attribute, value in self.__dict__.items():
+            print(f"{attribute}: {value}")
+        #print("directory", self.directory)
 
         orig_pbc = self.atoms.pbc.copy()
         try:
