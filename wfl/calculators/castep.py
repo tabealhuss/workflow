@@ -98,7 +98,7 @@ class Castep(WFLFileIOCalculator, ASE_Castep):
             calculation_succeeded = True
             if 'DFT_FAILED_CASTEP' in atoms.info:
                 del atoms.info['DFT_FAILED_CASTEP']
-            self.atoms.arrays["efg"] = get_efg(atoms, self.directory)
+            self.atoms.arrays["efg"] = get_efg(atoms, self._directory)
         except Exception as exc:
             atoms.info['DFT_FAILED_CASTEP'] = True
             calculation_succeeded = False
