@@ -70,7 +70,8 @@ class Castep(WFLFileIOCalculator, ASE_Castep):
         Get all .magres files in folder and convert those to xyz based on kwargs passed in
         '''
         config, failures = magres2dict(os.path.join(self._directory, "castep.magres"), as_model=True)
-        efg_np = np.array([atom["electric_field_gradient"] for atom in config])
+        efg_np = np.array([np.ndarray.flatten(atom["electric_field_gradient"]) for atom in config])
+        # efg_np = np.ndarray.flatten(np.array([atom["electric_field_gradient"] for atom in config]))
         print(efg_np, np.shape(efg_np))
         return efg_np
 
