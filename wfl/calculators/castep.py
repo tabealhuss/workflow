@@ -69,7 +69,7 @@ class Castep(WFLFileIOCalculator, ASE_Castep):
         '''
         Get all .magres files in folder and convert those to xyz based on kwargs passed in
         '''
-        config, failures = magres2dict(os.path.join(self.directory, "castep.magres"), as_model=True)
+        config, failures = magres2dict(os.path.join(self._directory, "castep.magres"), as_model=True)
         efg_np = np.array([atom["electric_field_gradient"] for atom in config])
         print(efg_np, np.shape(efg_np))
         return efg_np
@@ -98,7 +98,7 @@ class Castep(WFLFileIOCalculator, ASE_Castep):
             calculation_succeeded = True
             if 'DFT_FAILED_CASTEP' in atoms.info:
                 del atoms.info['DFT_FAILED_CASTEP']
-            self.atoms.arrays["efg"] = get_efg(atoms, self._directory)
+            self.atoms.arrays["efg"] = self.get_efg()
         except Exception as exc:
             atoms.info['DFT_FAILED_CASTEP'] = True
             calculation_succeeded = False
@@ -117,7 +117,7 @@ class Castep(WFLFileIOCalculator, ASE_Castep):
             self.clean_rundir(_default_keep_files, calculation_succeeded)
 
             # reset pbc because Castep overwrites it to True
-            self.atoms.pbc = orig_pbc(False)
+            self.atoms.pbc = orig_pbc
 
 
     def setup_calc_params(self, properties):
