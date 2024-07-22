@@ -3,10 +3,10 @@ Quantum Castep interface
 """
 
 from copy import deepcopy
-
+import numpy as np
 from ase.calculators.calculator import all_changes
 from ase.calculators.castep import Castep as ASE_Castep
-
+from matador.scrapers import magres2dict
 from .wfl_fileio_calculator import WFLFileIOCalculator
 
 # NOMAD compatible, see https://nomad-lab.eu/prod/rae/gui/uploads
@@ -65,21 +65,30 @@ class Castep(WFLFileIOCalculator, ASE_Castep):
         super().__init__(keep_files=keep_files, rundir_prefix=rundir_prefix,
                          workdir=workdir, scratchdir=scratchdir, **kwargs)
 
+    def get_efg(self):
+        '''
+        Get all .magres files in folder and convert those to xyz based on kwargs passed in
+        '''
+        config, failures = magres2dict(os.path.join(self.directory, "castep.magres"), as_model=True)
+        efg_np = np.array([atom["electric_field_gradient"] for atom in config])
+        print(efg_np, np.shape(efg_np))
+        return efg_np
+
 
     def calculate(self, atoms=None, properties=_default_properties, system_changes=all_changes):
         """Do the calculation. Handles the working directories in addition to regular
         ASE calculation operations (writing input, executing, reading_results)
         Reimplements & extends GenericFileIOCalculator.calculate() for the development version of ASE
         or FileIOCalculator.calculate() for the v3.22.1"""
-
+        print("entering calculator function")
         if atoms is not None:
             self.atoms = atoms.copy()
-
         # this may modify self.parameters, will reset them back to initial after calculation
         self.setup_calc_params(properties)
 
         # from WFLFileIOCalculator
         self.setup_rundir()
+        print("directory", self.directory)
 
         orig_pbc = self.atoms.pbc.copy()
         try:
@@ -87,6 +96,7 @@ class Castep(WFLFileIOCalculator, ASE_Castep):
             calculation_succeeded = True
             if 'DFT_FAILED_CASTEP' in atoms.info:
                 del atoms.info['DFT_FAILED_CASTEP']
+            self.atoms.arrays["efg"] = get_efg(atoms, self.directory)
         except Exception as exc:
             atoms.info['DFT_FAILED_CASTEP'] = True
             calculation_succeeded = False
