@@ -26,10 +26,10 @@ def save_calc_results(atoms, *, prefix, properties):
     if atoms.info.pop("__calculator_results_saved", False):
         return
 
-    if isinstance(prefix, str) and len(prefix) == 0:
-        raise ValueError('Refusing to save calculator results into info/arrays fields with no prefix,'
-                         ' too much chance of confusion with ASE extxyz reading/writing and conversion'
-                         ' to SinglePointCalculator')
+    #if isinstance(prefix, str) and len(prefix) == 0:
+    #    raise ValueError('Refusing to save calculator results into info/arrays fields with no prefix,'
+    #                     ' too much chance of confusion with ASE extxyz reading/writing and conversion'
+    #                     ' to SinglePointCalculator')
 
     if properties is None:
         # This will not work for calculators like Castep that (as of some point
@@ -83,11 +83,11 @@ def save_calc_results(atoms, *, prefix, properties):
         atoms_results['energies'] = atoms.get_potential_energies()
 
     if "extra_results" in dir(atoms.calc):
-        if prefix is None and (len(atoms.calc.extra_results.get("config", {})) > 0 or
-                                       len(atoms.calc.extra_results.get("atoms", {})) > 0):
-            raise ValueError('Refusing to save calculator results into info/arrays fields with no prefix,'
-                            ' too much chance of confusion with ASE extxyz reading/writing and conversion'
-                            ' to SinglePointCalculator')
+        #if prefix is None and (len(atoms.calc.extra_results.get("config", {})) > 0 or
+        #                               len(atoms.calc.extra_results.get("atoms", {})) > 0):
+        #    raise ValueError('Refusing to save calculator results into info/arrays fields with no prefix,'
+        #                    ' too much chance of confusion with ASE extxyz reading/writing and conversion'
+        #                    ' to SinglePointCalculator')
 
         for key, vals in atoms.calc.extra_results["config"].items():
             config_results[key] = vals
