@@ -3,7 +3,7 @@ Quantum Castep interface
 """
 
 from copy import deepcopy
-
+import numpy as np
 from ase.calculators.calculator import all_changes
 from ase.calculators.castep import Castep as ASE_Castep
 
