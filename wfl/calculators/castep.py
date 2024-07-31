@@ -8,7 +8,7 @@ from ase.calculators.calculator import all_changes
 from ase.calculators.castep import Castep as ASE_Castep
 
 from .wfl_fileio_calculator import WFLFileIOCalculator
-
+from matador.scrapers import magres2dict
 # NOMAD compatible, see https://nomad-lab.eu/prod/rae/gui/uploads
 _default_keep_files = ["*.castep", "*.param", "*.cell"]
 _default_properties = ["energy", "forces", "stress"]
@@ -67,6 +67,13 @@ class Castep(WFLFileIOCalculator, ASE_Castep):
         super().__init__(keep_files=keep_files, rundir_prefix=rundir_prefix,
                          workdir=workdir, scratchdir=scratchdir, **kwargs)
 
+    def get_efg(self):
+        """read the efg tensor from the castep.magres file in the self._directory folder
+        """
+        config, failures = magres2dict(os.path.join(self._directory, "castep.magres"), as_model=True)
+        efg_np = np.array([np.ndarray.flatten(atom["electric_field_gradient"]) for atom in config])
+        return efg_np
+
 
     def calculate(self, atoms=None, properties=_default_properties, system_changes=all_changes):
         """Do the calculation. Handles the working directories in addition to regular
@@ -89,6 +96,8 @@ class Castep(WFLFileIOCalculator, ASE_Castep):
             calculation_succeeded = True
             if 'DFT_FAILED_CASTEP' in atoms.info:
                 del atoms.info['DFT_FAILED_CASTEP']
+            if "*.magres" in self._wfl_keep_files:
+                self.atoms.arrays["efg"] = self.get_efg()
         except Exception as exc:
             atoms.info['DFT_FAILED_CASTEP'] = True
             calculation_succeeded = False
