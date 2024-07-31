@@ -9,6 +9,7 @@ from ase.calculators.castep import Castep as ASE_Castep
 
 from .wfl_fileio_calculator import WFLFileIOCalculator
 from matador.scrapers import magres2dict
+import os
 # NOMAD compatible, see https://nomad-lab.eu/prod/rae/gui/uploads
 _default_keep_files = ["*.castep", "*.param", "*.cell"]
 _default_properties = ["energy", "forces", "stress"]
